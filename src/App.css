@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+/* 
+.main_form {
+  display: flex;
+
+  '& .MuiSlider-thumb': {
+    borderRadius: '1px',
+} */
+
+.textfield_input {
+    margin-right: 30px;
+
+}
