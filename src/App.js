@@ -4,17 +4,13 @@ import './App.css';
 import { useFormik } from 'formik';
 import { Formik, Form, Field } from 'formik';
 import * as yup from 'yup';
-// import { object, string, number, date, InferType } from 'yup';
+import { object, string, number, date, InferType } from 'yup';
+import InputAdornment from '@mui/material/InputAdornment';
 
 
-// import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-// import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import Checkbox from '@mui/material/Checkbox';
-// import Link from '@mui/material/Link';
-// import Grid from '@mui/material/Grid';
+
 import Box from '@mui/material/Box';
 // // import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 // import Typography from '@mui/material/Typography';
@@ -35,18 +31,27 @@ import Box from '@mui/material/Box';
 
 
 
-
 const App = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState ('');
 
 
-  const validationSchema = yup.object().shape({
-    email: yup
+  const validationSchema = yup.object({
+    login: yup.string().email("Enter your email correctly.").required("Required field. Enter your email."),
+    password: yup
       .string()
-      .email("Enter your email correctly.")
-      .required("Required field. Enter your email."),
-    password: yup.string().required("Required field. Enter your password."),
+      .min(6, "Please enter at least 6 characters.")
+      .max(12, "Enter a maximum of 12 characters.")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}/,
+        "The password does not meet security requirements."
+      )
+      .required("Required field. Enter your password."),
+    confirmation: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords do not match.")
+    .required("Required field. Repeat password."),
   });
 
 
@@ -54,18 +59,20 @@ const App = () => {
     initialValues: {
       login: login,
       password: password,
+      confirmation: confirmation,
+
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      console.log(formik.values)
       setLogin(values.login);
-      setPassword(values.setPassword) 
-      console.log(values);
+      setPassword(values.password) 
     },
   });
 
   return (
     <div>
-      <form onSubmit={formik.handleSubmit} class="main_form">
+      <form onSubmit={formik.handleSubmit} className="main_form">
         <Box 
           sx={{ 
             display: 'grid', 
@@ -73,9 +80,9 @@ const App = () => {
             width: 300,
             // marginLeft: auto,
             }}>
-        <TextField
+
+          <TextField
             fullWidth
-            id="login"
             name="login"
             label="Login"
             variant="outlined"
@@ -84,35 +91,51 @@ const App = () => {
             autoFocus
             autoComplete="login"
             margin="normal"
-    
-            // class="textfield_input"
-            // error={formik.touched.email && Boolean(formik.errors.email)}
-            // helperText={formik.touched.email && formik.errors.email}
+            className="textfield_input"
+            error={formik.touched.login && !!formik.errors.login}
+            helperText={formik.touched.login ? formik.errors.login : null}
+            onBlur={formik.handleBlur}
+            
           />
 
-        <TextField
-          fullWidth
-          id="password"
-          name="password"
-          label="Password"
-          variant="outlined"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          margin="normal"
-          // class="textfield_input"
-          // error={formik.touched.email && Boolean(formik.errors.email)}
-          // helperText={formik.touched.email && formik.errors.email}
-        />    
+          <TextField
+            fullWidth
+            name="password"
+            label="Password"
+            variant="outlined"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            margin="normal"
+            className="textfield_input"
+            error={formik.touched.password && !!formik.errors.password}
+            helperText={formik.touched.password ? formik.errors.password : null}
+            onBlur={formik.handleBlur}
+          />    
 
-              <Button 
-                variant="contained" 
-                type ="submit" 
-                sx={{ 
-                    width: 150,
-                }}>
-                    Submit
-              </Button>
-          </Box>
+            <TextField
+            fullWidth
+            name="confirmation"
+            label="Confirm password"
+            variant="outlined"
+            value={formik.values.confirmation}
+            onChange={formik.handleChange}
+            margin="normal"
+            className="textfield_input"
+            error={formik.touched.confirmation && !!formik.errors.confirmation}
+            helperText={formik.touched.confirmation ? formik.errors.confirmation : null}
+            onBlur={formik.handleBlur}
+
+          /> 
+
+          <Button 
+            variant="contained" 
+            type ="submit" 
+            sx={{ 
+                width: 150,
+            }}>
+                Submit
+          </Button>
+        </Box>
 
       </form>
     </div>
